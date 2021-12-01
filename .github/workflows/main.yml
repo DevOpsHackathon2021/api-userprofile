@@ -24,8 +24,8 @@ jobs:
       - name: Run npm install
         run: npm install
 
-      - name: Run npm start
-        run: npm start
+      # - name: Run npm start
+      #   run: npm start
 
       - name: Run npm run test
         run: npm run test
