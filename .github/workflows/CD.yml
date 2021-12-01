@@ -49,6 +49,6 @@ jobs:
 
       - uses: azure/webapps-deploy@v2
         with:
-          app-name: env.APPNAME
+          app-name: ${env.APPNAME}
           slot-name: production
           images: '${env.ACRNAME}/${ env.APINAME }:${{ github.sha }}'
