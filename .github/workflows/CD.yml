@@ -28,4 +28,4 @@ jobs:
           creds: ${{ secrets.AZURE_CREDS }}
     
       - name: Push image to container registry
-        run: az acr build --image "devopsoh/api-userprofile:${GITHUB_SHA}" --registry env.ACRNAME
+        run: az acr build --image "devopsoh/api-userprofile:${GITHUB_SHA}" --registry env.ACRNAME .
