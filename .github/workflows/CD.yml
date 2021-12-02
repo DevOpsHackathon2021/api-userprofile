@@ -31,13 +31,13 @@ jobs:
       - name: Push image to container registry
         run: az acr build --image "devopsoh/${{ env.APINAME }}:${{ github.sha }}" --registry ${{ env.ACRNAME }} .
 
-  deploy_appservice:
+  deploy_staging:
     # The type of runner that the job will run on
     if: success()
     needs: deploy_image
     runs-on: ubuntu-latest
     env:
-      ACRNAME: openhackx6e34ru4acr.azurecr.io
+      ACRNAME: openhackx6e34ru4acr
       APPNAME: openhackx6e34ru4userprofile
       APINAME: api-userprofile
 
@@ -50,5 +50,69 @@ jobs:
       - uses: azure/webapps-deploy@v2
         with:
           app-name: ${{env.APPNAME}}
-          slot-name: production
-          images: '${{env.ACRNAME}}/${{env.APINAME}}:${{github.sha}}'
+          slot-name: staging
+          images: '${{env.ACRNAME}}.azurecr.io/devopsoh/${{ env.APINAME }}:${{github.sha}}'
+
+      - name: Health check
+        run: |
+          chmod +x ./polling.sh
+          ./polling.sh -i ${APPNAME}-staging.azurewebsites.net/api/healthcheck/user
+
+  deploy_production:
+    if: success()             # Deploy only when staging deploy and health check was successful
+    needs: deploy_staging      # Wait for deploy
+    runs-on: ubuntu-latest
+    
+    env:
+      ACRNAME: openhackx6e34ru4acr
+      APPNAME: openhackx6e34ru4userprofile
+      APPRSG: openhackx6e34ru4rg
+      APINAME: api-userprofile
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDS }}
+
+      - name: Swap Staging and Production slots
+        run: az webapp deployment slot swap -g ${{APPRSG}} -n ${{APPNAME}} --slot staging --target-slot production
+
+      - name: Health check
+        run: |
+          chmod +x ./polling.sh
+          ./polling.sh -i ${APPNAME}.azurewebsites.net/api/healthcheck/user
+
+  rollback:
+    if: failure()             # Deploy only when staging deploy and health check was successful
+    needs: deploy_production      # Wait for deploy
+    runs-on: ubuntu-latest
+    
+    env:
+      APPNAME: openhackx6e34ru4userprofile
+      APPRSG: openhackx6e34ru4rg
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDS }}
+
+      - name: Swap Staging and Production slots
+        run: az webapp deployment slot swap -g ${{APPRSG}} -n ${{APPNAME}} --slot staging --target-slot production
+
+      - uses: nashmaniac/create-issue-action@v1.1
+        name: Create Issue Action
+        if: ${{ failure() }}
+        with:
+          title: Production deployment Failed
+          token: ${{secrets.GITHUB_TOKEN}}
+          assignees: ${{github.actor}}
+          labels: production-deployment-failed
+          body: Deployment to production failed ${{github.sha}}
