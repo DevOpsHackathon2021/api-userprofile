@@ -16,7 +16,7 @@
         "swagger-ui-express": "^3.0.10",
         "swaggerize-express": "^4.0.5",
         "swagmock": "1.0.0",
-        "tedious": "^2.6.4",
+        "tedious": "^14.0.0",
         "trim": "^1.0.1"
     },
     "devDependencies": {
