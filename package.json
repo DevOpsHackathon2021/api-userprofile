@@ -25,7 +25,7 @@
         "js-yaml": "3.13.1",
         "nyc": "15.1.0",
         "supertest": "4.0.2",
-        "swagger-parser": "9.0.1",
+        "swagger-parser": "10.0.3",
         "tap-junit": "^5.0.1",
         "tape": "5.0.0"
     },
