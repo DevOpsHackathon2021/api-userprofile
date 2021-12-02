@@ -24,7 +24,7 @@
         "is-my-json-valid": "2.20.0",
         "js-yaml": "3.13.1",
         "nyc": "15.1.0",
-        "supertest": "4.0.2",
+        "supertest": "6.1.6",
         "swagger-parser": "10.0.3",
         "tap-junit": "^5.0.1",
         "tape": "5.0.0"
