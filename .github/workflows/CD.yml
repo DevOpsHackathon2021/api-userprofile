@@ -87,7 +87,7 @@ jobs:
       - name: Health check
         run: |
           chmod +x ./polling.sh
-          ./polling.sh -i ${env.APPNAME}.azurewebsites.net/api/healthcheck/user
+          ./polling.sh -i ${{env.APPNAME}}.azurewebsites.net/api/healthcheck/user
 
   rollback:
     if: failure()             # Deploy only when staging deploy and health check was successful
