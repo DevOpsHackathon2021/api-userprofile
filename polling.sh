@@ -47,7 +47,7 @@ healthcheck() {
     echo $result
 }
 
-for x in {0..120}
+for x in {1..10}
 do
    result=`healthcheck $endpoint` 
    declare status
