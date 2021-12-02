@@ -79,12 +79,12 @@ jobs:
           creds: ${{ secrets.AZURE_CREDS }}
 
       - name: Swap Staging and Production slots
-        run: az webapp deployment slot swap -g ${{APPRSG}} -n ${{APPNAME}} --slot staging --target-slot production
+        run: az webapp deployment slot swap -g ${{env.APPRSG}} -n ${{env.APPNAME}} --slot staging --target-slot production
 
       - name: Health check
         run: |
           chmod +x ./polling.sh
-          ./polling.sh -i ${APPNAME}.azurewebsites.net/api/healthcheck/user
+          ./polling.sh -i ${env.APPNAME}.azurewebsites.net/api/healthcheck/user
 
   rollback:
     if: failure()             # Deploy only when staging deploy and health check was successful
@@ -105,7 +105,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDS }}
 
       - name: Swap Staging and Production slots
-        run: az webapp deployment slot swap -g ${{APPRSG}} -n ${{APPNAME}} --slot staging --target-slot production
+        run: az webapp deployment slot swap -g ${{env.APPRSG}} -n ${{env.APPNAME}} --slot staging --target-slot production
 
       - uses: nashmaniac/create-issue-action@v1.1
         name: Create Issue Action
